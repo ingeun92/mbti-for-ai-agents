@@ -29,9 +29,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    if (!Array.isArray(answers) || answers.length !== 20) {
+    if (!Array.isArray(answers) || answers.length !== 60) {
       return NextResponse.json(
-        { status: 'error', error: 'answers must be an array of 20 numbers' },
+        { status: 'error', error: 'answers must be an array of 60 numbers' },
         { status: 400 }
       );
     }

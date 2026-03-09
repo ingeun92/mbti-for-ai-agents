@@ -19,7 +19,7 @@ const oppositePole: Record<string, keyof Scores> = {
  * For each question, based on its pole:
  *   - Add value to the pole's score
  *   - Add (8 - value) to the opposite pole's score
- * Each pole's score ranges from 5 to 35.
+ * Each pole's score ranges from 15 to 105.
  */
 export function computeScores(answers: number[]): Scores {
   const scores: Scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };

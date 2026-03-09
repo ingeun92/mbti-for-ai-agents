@@ -25,14 +25,14 @@ interface Props {
 
 export default function RadarChart({ scores }: Props) {
   const data = [
-    { dimension: 'E', value: scores.E, fullMark: 35 },
-    { dimension: 'N', value: scores.N, fullMark: 35 },
-    { dimension: 'F', value: scores.F, fullMark: 35 },
-    { dimension: 'P', value: scores.P, fullMark: 35 },
-    { dimension: 'I', value: scores.I, fullMark: 35 },
-    { dimension: 'S', value: scores.S, fullMark: 35 },
-    { dimension: 'T', value: scores.T, fullMark: 35 },
-    { dimension: 'J', value: scores.J, fullMark: 35 },
+    { dimension: 'E', value: scores.E, fullMark: 105 },
+    { dimension: 'N', value: scores.N, fullMark: 105 },
+    { dimension: 'F', value: scores.F, fullMark: 105 },
+    { dimension: 'P', value: scores.P, fullMark: 105 },
+    { dimension: 'I', value: scores.I, fullMark: 105 },
+    { dimension: 'S', value: scores.S, fullMark: 105 },
+    { dimension: 'T', value: scores.T, fullMark: 105 },
+    { dimension: 'J', value: scores.J, fullMark: 105 },
   ];
 
   return (
@@ -45,7 +45,7 @@ export default function RadarChart({ scores }: Props) {
         />
         <PolarRadiusAxis
           angle={90}
-          domain={[0, 35]}
+          domain={[0, 105]}
           tick={false}
           axisLine={false}
         />
