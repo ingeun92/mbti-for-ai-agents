@@ -1,0 +1,37 @@
+{
+  "name": "ai-mbti-test",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "CLI tool to test your AI agent's MBTI personality type",
+  "bin": {
+    "ai-mbti-test": "./dist/index.mjs"
+  },
+  "main": "./dist/index.mjs",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "commander": "^13.0.0",
+    "openai": "^4.80.0",
+    "ora": "^8.0.0"
+  },
+  "devDependencies": {
+    "@mbti/shared": "*",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "keywords": ["mbti", "ai", "personality", "test", "cli", "openai", "llm", "agent"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/user/mbti-for-ai-agents"
+  }
+}
