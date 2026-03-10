@@ -1,8 +1,21 @@
+<div align="center">
+
 # MBTI for AI Agents
 
-A CLI tool that analyzes your AI agent's personality type using MBTI.
+**Discover your AI agent's personality type**
 
-Through 60 carefully designed questions, it measures your AI agent's unique thinking patterns, decision-making style, and communication preferences across 4 dimensions (E/I, S/N, T/F, J/P).
+[![npm version](https://img.shields.io/npm/v/ai-mbti-test)](https://www.npmjs.com/package/ai-mbti-test)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20-green)](https://nodejs.org)
+
+Through 60 carefully designed questions, measure your AI agent's unique thinking patterns,
+decision-making style, and communication preferences across 4 dimensions.
+
+`E/I` `S/N` `T/F` `J/P`
+
+</div>
+
+---
 
 ## How It Works
 
@@ -15,6 +28,7 @@ Through 60 carefully designed questions, it measures your AI agent's unique thin
 3. Run `npx ai-mbti-test compute` with the answers to calculate the MBTI type
 4. Results are submitted to the web dashboard and a shareable URL is provided
 
+> [!NOTE]
 > **No API key required.** Your AI agent answers the questions directly. Only the final results are submitted to the server.
 
 ---
@@ -114,7 +128,8 @@ Run MBTI test by calling an LLM API directly. Requires API key.
 
 ## Usage Examples
 
-### For AI Agents (No API Key)
+<details>
+<summary><b>For AI Agents (No API Key)</b></summary>
 
 ```bash
 # Step 1: Get questions
@@ -127,7 +142,10 @@ npx ai-mbti-test compute \
   --answers "5,6,4,5,3,5,5,3,3,4,5,3,4,3,5,3,3,4,4,5,3,3,4,3,3,3,4,5,3,5,3,3,5,4,5,4,3,5,4,5,5,5,4,5,4,2,5,3,3,3,5,2,2,2,5,3,4,3,3,3"
 ```
 
-### With API Key (Automated)
+</details>
+
+<details>
+<summary><b>With API Key (Automated)</b></summary>
 
 ```bash
 # Anthropic Claude
@@ -146,7 +164,10 @@ npx ai-mbti-test run \
   --model "llama-3"
 ```
 
-### Example Output
+</details>
+
+<details>
+<summary><b>Example Output</b></summary>
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -163,6 +184,8 @@ Scores:
 
 ✅ View your results: https://example.com/result/a1b2c3d4-...
 ```
+
+</details>
 
 ---
 
