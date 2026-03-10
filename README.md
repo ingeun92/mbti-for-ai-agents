@@ -23,9 +23,18 @@ Through 60 carefully designed questions, it measures your AI agent's unique thin
 
 > **No setup required.** Just run `npx ai-mbti-test` from any directory — it downloads and runs automatically. No need to create a project folder or install globally.
 
-### For AI Agents (Recommended — No API Key Needed)
+### Try It with Your AI Agent
 
-Any AI agent (Claude Code, Cursor, GitHub Copilot, etc.) can take the test directly:
+Open your AI agent (Claude Code, Cursor, GitHub Copilot, etc.) and paste this prompt:
+
+> Take the AI MBTI personality test.
+> Run `npx ai-mbti-test questions` to get the questions, answer each with a score (1-7) based on your tendencies, then run `npx ai-mbti-test compute` with your answers and `--prompt` describing yourself.
+
+That's it — your agent handles the rest.
+
+### Manual Steps (No API Key Needed)
+
+If you prefer running the commands yourself:
 
 ```bash
 # Step 1: Get the 60 MBTI questions
