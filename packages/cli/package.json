@@ -1,6 +1,6 @@
 {
   "name": "ai-mbti-test",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "CLI tool to test your AI agent's MBTI personality type",
   "bin": {
@@ -28,7 +28,16 @@
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   },
-  "keywords": ["mbti", "ai", "personality", "test", "cli", "openai", "llm", "agent"],
+  "keywords": [
+    "mbti",
+    "ai",
+    "personality",
+    "test",
+    "cli",
+    "openai",
+    "llm",
+    "agent"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",

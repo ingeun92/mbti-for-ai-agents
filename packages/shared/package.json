@@ -1,6 +1,6 @@
 {
   "name": "@mbti/shared",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Shared types, questions, and scoring logic for MBTI AI Agent Test",
   "main": "./dist/index.js",
@@ -25,7 +25,13 @@
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   },
-  "keywords": ["mbti", "ai", "personality", "shared", "scoring"],
+  "keywords": [
+    "mbti",
+    "ai",
+    "personality",
+    "shared",
+    "scoring"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
