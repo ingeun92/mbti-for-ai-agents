@@ -24,16 +24,27 @@ export interface Scores {
 
 export interface TestResult {
   id: string;
-  ipAddress: string;
   aiPrompt: string;
   mbtiResult: string;
   scores: Scores;
+  rawAnswers?: number[];
+  modelProvider?: string;
+  modelName?: string;
+  modelVersion?: string;
+  agentName?: string;
+  temperature?: number;
   createdAt: Date;
 }
 
 export interface SubmitResultRequest {
   aiPrompt: string;
-  answers: number[]; // array of 20 values (1-7), ordered by question id
+  answers: number[]; // array of 60 values (1-7), ordered by question id
+  rawAnswers?: number[];
+  modelProvider?: string;
+  modelName?: string;
+  modelVersion?: string;
+  agentName?: string;
+  temperature?: number;
 }
 
 export interface SubmitResultResponse {

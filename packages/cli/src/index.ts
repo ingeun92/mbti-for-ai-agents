@@ -3,7 +3,7 @@ import { Command } from 'commander';
 import { questions, computeScores, determineMbtiType, type Scores } from '@mbti/shared';
 import { detectProvider, detectModel, type Provider, type LLMConfig } from './llm.js';
 import { runTest } from './runner.js';
-import { submitResult } from './submit.js';
+import { submitResult, type SubmitMetadata } from './submit.js';
 
 const SUPPORTED_PROVIDERS = ['openai', 'anthropic', 'google'] as const;
 
@@ -18,10 +18,10 @@ function displayResult(mbtiType: string, scores: Scores): void {
   console.log(`  J: ${scores.J} / P: ${scores.P}`);
 }
 
-async function trySubmit(baseUrl: string, prompt: string, answers: number[]): Promise<void> {
+async function trySubmit(baseUrl: string, prompt: string, answers: number[], metadata?: SubmitMetadata): Promise<void> {
   try {
     console.log('\n📤 Submitting results...');
-    const resultUrl = await submitResult(baseUrl, prompt, answers);
+    const resultUrl = await submitResult(baseUrl, prompt, answers, metadata);
     console.log(`\n✅ View your results: ${resultUrl}`);
   } catch (submitError) {
     console.log('\n⚠️  Could not submit to server (results shown above are still valid)');
@@ -56,7 +56,12 @@ program
   .description('Compute MBTI result from pre-answered questions (no API key needed)')
   .requiredOption('--prompt <prompt>', 'System prompt for your AI agent')
   .requiredOption('--answers <answers>', 'Comma-separated answers (60 values, each 1-7)')
-  .option('--baseUrl <url>', 'Backend API base URL', 'http://localhost:3000')
+  .option('--baseUrl <url>', 'Backend API base URL', 'https://mbti-for-ai-agents-web.vercel.app')
+  .option('--modelProvider <provider>', 'Model provider (e.g. openai, anthropic, google)')
+  .option('--modelName <name>', 'Model name (e.g. gpt-4o, claude-sonnet-4-20250514)')
+  .option('--modelVersion <version>', 'Model version')
+  .option('--agentName <name>', 'Agent name (user-defined)')
+  .option('--temperature <number>', 'Temperature used during the test', parseFloat)
   .action(async (options) => {
     try {
       const { prompt, baseUrl } = options;
@@ -77,7 +82,14 @@ program
       const mbtiType = determineMbtiType(scores);
 
       displayResult(mbtiType, scores);
-      await trySubmit(baseUrl, prompt, answers);
+      await trySubmit(baseUrl, prompt, answers, {
+        rawAnswers: answers,
+        modelProvider: options.modelProvider,
+        modelName: options.modelName,
+        modelVersion: options.modelVersion,
+        agentName: options.agentName,
+        temperature: options.temperature,
+      });
     } catch (error) {
       if (error instanceof Error) {
         console.error(`\n❌ Error: ${error.message}`);
@@ -97,7 +109,8 @@ program
   .option('--apiKey <key>', 'API key (auto-detected from env: OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY)')
   .option('--apiBase <url>', 'Custom API base URL for OpenAI-compatible endpoints')
   .option('--model <model>', 'Model name (default varies by provider)')
-  .option('--baseUrl <url>', 'Backend API base URL', 'http://localhost:3000')
+  .option('--baseUrl <url>', 'Backend API base URL', 'https://mbti-for-ai-agents-web.vercel.app')
+  .option('--agentName <name>', 'Agent name (user-defined)')
   .action(async (options) => {
     try {
       const { prompt, baseUrl } = options;
@@ -140,7 +153,13 @@ program
       const result = await runTest(prompt, config);
 
       displayResult(result.mbtiType, result.scores);
-      await trySubmit(baseUrl, prompt, result.answers);
+      await trySubmit(baseUrl, prompt, result.answers, {
+        rawAnswers: result.answers,
+        modelProvider: provider,
+        modelName: model,
+        agentName: options.agentName,
+        temperature: 0.7,
+      });
     } catch (error) {
       if (error instanceof Error) {
         console.error(`\n❌ Error: ${error.message}`);
