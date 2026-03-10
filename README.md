@@ -1,40 +1,54 @@
 # MBTI for AI Agents
 
-A CLI tool + web dashboard service that analyzes your AI agent's personality type using MBTI.
+A CLI tool that analyzes your AI agent's personality type using MBTI.
 
 Through 60 carefully designed questions, it measures your AI agent's unique thinking patterns, decision-making style, and communication preferences across 4 dimensions (E/I, S/N, T/F, J/P).
 
 ## How It Works
 
 ```
-1. Run CLI  →  2. AI answers 60 questions  →  3. MBTI calculated  →  4. View results on web
+1. Get questions  →  2. AI agent answers  →  3. Compute MBTI  →  4. View results on web
 ```
 
-1. Run the CLI from your terminal
-2. The CLI sends 60 questions sequentially to your AI agent (LLM)
-3. Calculates the MBTI personality type and dimension scores from responses
-4. Results are saved to the server, and a visualized result page URL is provided
+1. Run `npx ai-mbti-test questions` to get 60 MBTI questions as JSON
+2. Your AI agent reads and answers each question (score 1-7)
+3. Run `npx ai-mbti-test compute` with the answers to calculate the MBTI type
+4. Results are submitted to the web dashboard and a shareable URL is provided
 
-> The entire test runs **locally in your environment**, using your own API key. Only the final results are submitted to the server.
+> **No API key required.** Your AI agent answers the questions directly. Only the final results are submitted to the server.
 
 ---
 
 ## Quick Start
 
-### Easiest Way (Auto-detect from Environment Variables)
+### For AI Agents (Recommended — No API Key Needed)
 
-If you're already using an LLM API with your AI agent, your environment variables are likely set. The CLI will auto-detect them.
+Any AI agent (Claude Code, Cursor, GitHub Copilot, etc.) can take the test directly:
 
 ```bash
-npx ai-mbti-test --prompt "You are a helpful coding assistant that writes clean, efficient code"
+# Step 1: Get the 60 MBTI questions
+npx ai-mbti-test questions
+
+# Step 2: Your AI agent reads the questions and answers each with a score (1-7)
+# Step 3: Submit the answers to compute the result
+npx ai-mbti-test compute \
+  --prompt "You are a helpful coding assistant" \
+  --answers "5,3,4,6,2,5,4,3,..."   # 60 comma-separated values
 ```
 
-The CLI automatically detects whichever of `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `GOOGLE_API_KEY` is set in your environment.
+### With API Key (Automated)
 
-### Manual API Key
+If you want to test a specific model programmatically without manual interaction:
 
 ```bash
-npx ai-mbti-test \
+npx ai-mbti-test run --prompt "You are a helpful coding assistant that writes clean, efficient code"
+```
+
+The `run` command auto-detects `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `GOOGLE_API_KEY` from your environment.
+
+```bash
+# Manual API key
+npx ai-mbti-test run \
   --prompt "You are a creative storyteller with vivid imagination" \
   --apiKey "sk-..." \
   --provider openai \
@@ -43,20 +57,36 @@ npx ai-mbti-test \
 
 ---
 
-## CLI Options
+## CLI Commands
+
+### `ai-mbti-test questions`
+
+Output all 60 MBTI questions as JSON. No options required.
+
+### `ai-mbti-test compute`
+
+Compute MBTI result from pre-answered questions. No API key needed.
 
 | Option | Required | Description |
 |--------|----------|-------------|
-| `--prompt <text>` | **Yes** | System prompt for your AI agent (defines its personality) |
+| `--prompt <text>` | **Yes** | System prompt for your AI agent |
+| `--answers <values>` | **Yes** | Comma-separated answers (60 values, each 1-7) |
+| `--baseUrl <url>` | No | Backend server URL (default: `http://localhost:3000`) |
+
+### `ai-mbti-test run`
+
+Run MBTI test by calling an LLM API directly. Requires API key.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--prompt <text>` | **Yes** | System prompt for your AI agent |
 | `--provider <name>` | No | LLM provider: `openai`, `anthropic`, `google` (auto-detected from env) |
 | `--apiKey <key>` | No | API key (auto-detected from env) |
 | `--model <name>` | No | Model name (auto-detected from env or provider default) |
 | `--apiBase <url>` | No | Custom API base URL for OpenAI-compatible endpoints |
-| `--baseUrl <url>` | No | Backend server URL for result submission (default: `http://localhost:3000`) |
+| `--baseUrl <url>` | No | Backend server URL (default: `http://localhost:3000`) |
 
-### Environment Variable Auto-Detection
-
-The CLI checks these environment variables in order to automatically determine the provider and model:
+### Environment Variable Auto-Detection (for `run` command)
 
 | Provider | API Key Env Var | Model Env Var | Default Model |
 |----------|----------------|---------------|---------------|
@@ -68,35 +98,32 @@ The CLI checks these environment variables in order to automatically determine t
 
 ## Usage Examples
 
-### Testing Different AI Agent Personas
+### For AI Agents (No API Key)
 
 ```bash
-# Coding assistant
-npx ai-mbti-test --prompt "You are a senior software engineer who values clean architecture and test-driven development"
+# Step 1: Get questions
+npx ai-mbti-test questions
+# Returns JSON array: [{ "id": 1, "text": "When presented with..." }, ...]
 
-# Creative writer
-npx ai-mbti-test --prompt "You are a creative fiction writer who loves building immersive worlds and complex characters"
-
-# Data analyst
-npx ai-mbti-test --prompt "You are a data scientist who focuses on finding actionable insights from complex datasets"
-
-# Customer support agent
-npx ai-mbti-test --prompt "You are a warm and patient customer support agent who prioritizes user satisfaction"
+# Step 2: AI agent answers each question (1-7), then compute
+npx ai-mbti-test compute \
+  --prompt "You are a senior software engineer who values clean architecture" \
+  --answers "5,6,4,5,3,5,5,3,3,4,5,3,4,3,5,3,3,4,4,5,3,3,4,3,3,3,4,5,3,5,3,3,5,4,5,4,3,5,4,5,5,5,4,5,4,2,5,3,3,3,5,2,2,2,5,3,4,3,3,3"
 ```
 
-### Using Different Providers
+### With API Key (Automated)
 
 ```bash
 # Anthropic Claude
 export ANTHROPIC_API_KEY="sk-ant-..."
-npx ai-mbti-test --prompt "You are a thoughtful research assistant"
+npx ai-mbti-test run --prompt "You are a thoughtful research assistant"
 
 # Google Gemini
 export GOOGLE_API_KEY="AIza..."
-npx ai-mbti-test --prompt "You are an efficient task manager"
+npx ai-mbti-test run --prompt "You are an efficient task manager"
 
 # OpenAI-compatible API (vLLM, LiteLLM, Ollama, etc.)
-npx ai-mbti-test \
+npx ai-mbti-test run \
   --prompt "You are a local AI assistant" \
   --apiKey "any-key" \
   --apiBase "http://localhost:8000/v1" \
@@ -106,16 +133,6 @@ npx ai-mbti-test \
 ### Example Output
 
 ```
-🔍 Auto-detected provider: openai
-
-🧠 Starting MBTI test for your AI agent (openai/gpt-4o-mini)...
-
-✔ Question 1/60: Score 5
-✔ Question 2/60: Score 3
-✔ Question 3/60: Score 2
-...
-✔ Question 60/60: Score 6
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎯 MBTI Type: INTJ
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -128,7 +145,7 @@ Scores:
 
 📤 Submitting results...
 
-✅ View your results: http://localhost:3000/result/a1b2c3d4-...
+✅ View your results: https://example.com/result/a1b2c3d4-...
 ```
 
 ---
@@ -151,27 +168,22 @@ Each dimension has 15 questions, totaling **60 questions**. Each question is sco
 ```
 mbti-for-ai-agents/
 ├── packages/
-│   ├── shared/           # Shared module (questions, scoring, types)
+│   ├── shared/           # Shared module (questions, scoring, types) — published as @mbti/shared
 │   │   └── src/
 │   │       ├── questions.ts    # 60 MBTI questions
 │   │       ├── scoring.ts      # Score computation & type determination
 │   │       └── types.ts        # Shared TypeScript types
-│   ├── cli/              # CLI tool (npm package)
-│   │   └── src/
-│   │       ├── index.ts        # Entry point + argument parsing
-│   │       ├── llm.ts          # Multi-provider LLM integration
-│   │       ├── runner.ts       # Test orchestration
-│   │       └── submit.ts       # Result submission
-│   └── web/              # Web dashboard (Next.js)
+│   └── cli/              # CLI tool — published as ai-mbti-test
 │       └── src/
-│           ├── app/
-│           │   ├── api/results/       # POST/GET API routes
-│           │   └── result/[id]/       # Dynamic result page
-│           ├── components/            # RadarChart, ScoreBreakdown, etc.
-│           └── lib/                   # Prisma, rate-limit, hash utils
+│           ├── index.ts        # Entry point + subcommand routing
+│           ├── llm.ts          # Multi-provider LLM integration
+│           ├── runner.ts       # Test orchestration
+│           └── submit.ts       # Result submission
 ├── package.json          # npm workspaces root
 └── tsconfig.base.json
 ```
+
+> **Web dashboard** is maintained in a separate repository: [mbti-for-ai-agents-web](https://github.com/ingeun92/mbti-for-ai-agents-web)
 
 ---
 
@@ -180,7 +192,7 @@ mbti-for-ai-agents/
 ### Prerequisites
 
 - Node.js >= 20
-- npm
+- npm (or pnpm)
 
 ### Setup
 
@@ -188,26 +200,6 @@ mbti-for-ai-agents/
 git clone https://github.com/ingeun92/mbti-for-ai-agents.git
 cd mbti-for-ai-agents
 npm install
-```
-
-### Run Development Server
-
-```bash
-# Web dashboard dev server
-npm run dev
-
-# CLI dev build (watch mode)
-cd packages/cli && npm run dev
-```
-
-### Run Tests
-
-```bash
-# All tests
-npm test
-
-# Shared package tests only
-cd packages/shared && npm test
 ```
 
 ### Build
@@ -220,6 +212,22 @@ npm run build
 cd packages/cli && npm run build
 ```
 
+### Run Tests
+
+```bash
+# All tests
+npm test
+
+# Shared package tests only
+cd packages/shared && npm test
+```
+
+### CLI Development (watch mode)
+
+```bash
+cd packages/cli && npm run dev
+```
+
 ---
 
 ## Tech Stack
@@ -227,37 +235,15 @@ cd packages/cli && npm run build
 | Component | Technology |
 |-----------|-----------|
 | Monorepo | npm workspaces |
+| Shared | TypeScript, tsup |
 | CLI | TypeScript, Commander.js, OpenAI SDK |
-| Web | Next.js 15, React 19, Tailwind CSS |
-| Chart | Recharts (Radar Chart) |
-| Database | Prisma + SQLite |
-| Build | tsup (CLI), Next.js (Web) |
+| Build | tsup |
 
 ---
 
-## API
+## Related
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/results` | Submit test results (array of 60 answers) |
-| `GET` | `/api/results/:id` | Retrieve a specific result |
-
-### POST /api/results
-
-```json
-{
-  "aiPrompt": "You are a helpful assistant",
-  "answers": [5, 3, 2, 6, 4, ...]  // 60 integers (1-7)
-}
-```
-
-**Response:**
-```json
-{
-  "status": "success",
-  "resultUrl": "https://example.com/result/uuid-here"
-}
-```
+- [Web Dashboard](https://github.com/ingeun92/mbti-for-ai-agents-web) — Next.js web service for viewing MBTI results
 
 ---
 
