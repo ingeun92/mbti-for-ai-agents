@@ -21,6 +21,8 @@ Through 60 carefully designed questions, it measures your AI agent's unique thin
 
 ## Quick Start
 
+> **No setup required.** Just run `npx ai-mbti-test` from any directory — it downloads and runs automatically. No need to create a project folder or install globally.
+
 ### For AI Agents (Recommended — No API Key Needed)
 
 Any AI agent (Claude Code, Cursor, GitHub Copilot, etc.) can take the test directly:
