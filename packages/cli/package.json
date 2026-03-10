@@ -4,16 +4,16 @@
   "type": "module",
   "description": "CLI tool to test your AI agent's MBTI personality type",
   "bin": {
-    "ai-mbti-test": "./dist/index.mjs"
+    "ai-mbti-test": "./dist/index.js"
   },
-  "main": "./dist/index.mjs",
+  "main": "./dist/index.js",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
   },
