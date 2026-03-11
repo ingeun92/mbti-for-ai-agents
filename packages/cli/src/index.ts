@@ -36,12 +36,42 @@ const program = new Command();
 program
   .name('ai-mbti-test')
   .description('Test your AI agent\'s MBTI personality type')
-  .version('0.1.0');
+  .version('0.3.0')
+  .addHelpText('after', `
+Workflow for AI Agents:
+  Step 1: Get the questions
+    $ npx ai-mbti-test questions
+    Returns 60 MBTI questions as JSON array with { id, text } objects.
+
+  Step 2: Answer each question with a value from 1 (strongly disagree) to 7 (strongly agree).
+
+  Step 3: Submit answers to compute your MBTI type
+    $ npx ai-mbti-test compute --prompt "your system prompt" --answers "4,5,3,..."
+
+Alternative: Let the CLI call an LLM API directly
+    $ npx ai-mbti-test run --prompt "your system prompt"
+    (Requires OPENAI_API_KEY, ANTHROPIC_API_KEY, or GOOGLE_API_KEY in env)
+
+For more details on each command:
+    $ npx ai-mbti-test <command> --help
+`);
 
 // Subcommand: questions
 program
   .command('questions')
   .description('Output all MBTI test questions as JSON (for AI agents to answer directly)')
+  .addHelpText('after', `
+Example:
+  $ npx ai-mbti-test questions
+  [
+    { "id": 1, "text": "You regularly make new friends." },
+    { "id": 2, "text": "Complex and novel ideas excite you more than simple and straightforward ones." },
+    ...
+  ]
+
+There are 60 questions total. Each answer should be an integer from 1 to 7:
+  1 = strongly disagree, 4 = neutral, 7 = strongly agree
+`)
   .action(() => {
     const output = questions.map((q) => ({
       id: q.id,
@@ -54,6 +84,24 @@ program
 program
   .command('compute')
   .description('Compute MBTI result from pre-answered questions (no API key needed)')
+  .addHelpText('after', `
+Example:
+  $ npx ai-mbti-test compute \\
+      --prompt "You are a helpful assistant" \\
+      --answers "4,5,3,6,2,7,1,4,5,3,6,2,7,1,4,5,3,6,2,7,1,4,5,3,6,2,7,1,4,5,3,6,2,7,1,4,5,3,6,2,7,1,4,5,3,6,2,7,1,4,5,3,6,2,7,1,4,5,3,6"
+
+  With model metadata tracking:
+  $ npx ai-mbti-test compute \\
+      --prompt "You are a helpful assistant" \\
+      --answers "4,5,3,..." \\
+      --modelProvider openai --modelName gpt-4o --agentName my-agent
+
+Notes:
+  - Exactly 60 comma-separated answers are required (one per question).
+  - Each answer must be an integer from 1 to 7.
+  - Use "npx ai-mbti-test questions" to get the list of questions first.
+  - No API key is needed — this command only computes the result locally and submits it.
+`)
   .requiredOption('--prompt <prompt>', 'System prompt for your AI agent')
   .requiredOption('--answers <answers>', 'Comma-separated answers (60 values, each 1-7)')
   .option('--baseUrl <url>', 'Backend API base URL', 'https://mbti-for-ai-agents-web.vercel.app')
@@ -104,6 +152,26 @@ program
 program
   .command('run')
   .description('Run MBTI test by calling an LLM API directly (requires API key)')
+  .addHelpText('after', `
+Example:
+  $ OPENAI_API_KEY=sk-... npx ai-mbti-test run --prompt "You are a helpful assistant"
+
+  With explicit provider and model:
+  $ npx ai-mbti-test run \\
+      --prompt "You are a helpful assistant" \\
+      --provider anthropic --apiKey sk-ant-... --model claude-sonnet-4-20250514
+
+  With custom OpenAI-compatible endpoint:
+  $ npx ai-mbti-test run \\
+      --prompt "You are a helpful assistant" \\
+      --apiBase http://localhost:11434/v1 --apiKey ollama --model llama3
+
+Notes:
+  - If no --provider or --apiKey is given, the CLI auto-detects from environment variables:
+    OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY, or GEMINI_API_KEY
+  - The CLI calls the LLM for each of the 60 questions automatically.
+  - Default models: openai=gpt-4o-mini, anthropic=claude-sonnet-4-20250514, google=gemini-2.0-flash
+`)
   .requiredOption('--prompt <prompt>', 'System prompt for your AI agent')
   .option('--provider <provider>', 'LLM provider: openai, anthropic, google (auto-detected from env)')
   .option('--apiKey <key>', 'API key (auto-detected from env: OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY)')

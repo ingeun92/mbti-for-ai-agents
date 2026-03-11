@@ -1,6 +1,6 @@
 {
   "name": "@mbti/shared",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Shared types, questions, and scoring logic for MBTI AI Agent Test",
   "main": "./dist/index.js",
