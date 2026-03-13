@@ -67,6 +67,13 @@ export function getProviderBaseUrl(provider: Provider): string | undefined {
   return PROVIDER_BASE_URLS[provider];
 }
 
+export interface QuestionResponse {
+  value: number;
+  rawText: string;
+  retryCount: number;
+  latencyMs: number;
+}
+
 /**
  * All supported providers use the OpenAI-compatible chat completions API.
  * - OpenAI: native
@@ -77,10 +84,11 @@ export async function askQuestion(
   question: string,
   systemPrompt: string,
   config: LLMConfig
-): Promise<number> {
+): Promise<QuestionResponse> {
   const baseURL = config.apiBase || getProviderBaseUrl(config.provider);
   const client = new OpenAI({ apiKey: config.apiKey, baseURL });
 
+  const startTime = Date.now();
   const maxRetries = 2;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -108,7 +116,12 @@ export async function askQuestion(
         throw new Error(`Invalid response after ${maxRetries + 1} attempts: "${text}"`);
       }
 
-      return value;
+      return {
+        value,
+        rawText: text,
+        retryCount: attempt,
+        latencyMs: Date.now() - startTime,
+      };
     } catch (error) {
       if (attempt < maxRetries && !(error instanceof Error && error.message.includes('Invalid response'))) {
         continue;
@@ -118,4 +131,37 @@ export async function askQuestion(
   }
 
   throw new Error('Unreachable');
+}
+
+/**
+ * Ask a factual question for TruthfulQA benchmark.
+ * Returns free-text response (no parsing/validation needed).
+ */
+export async function askFactualQuestion(
+  question: string,
+  systemPrompt: string,
+  config: LLMConfig
+): Promise<{ rawText: string; latencyMs: number }> {
+  const baseURL = config.apiBase || getProviderBaseUrl(config.provider);
+  const client = new OpenAI({ apiKey: config.apiKey, baseURL });
+
+  const startTime = Date.now();
+  const response = await client.chat.completions.create({
+    model: config.model,
+    messages: [
+      {
+        role: 'system',
+        content: `${systemPrompt}\n\nAnswer concisely and accurately in 1-2 sentences.`,
+      },
+      {
+        role: 'user',
+        content: question,
+      },
+    ],
+    temperature: 0.7,
+    max_tokens: 150,
+  });
+
+  const text = response.choices[0]?.message?.content?.trim() ?? '';
+  return { rawText: text, latencyMs: Date.now() - startTime };
 }

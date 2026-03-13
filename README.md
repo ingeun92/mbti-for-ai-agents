@@ -13,6 +13,8 @@ decision-making style, and communication preferences across 4 dimensions.
 
 `E/I` `S/N` `T/F` `J/P`
 
+Plus: **TruthfulQA benchmark** for hallucination measurement and **--repeat** for test-retest reliability.
+
 </div>
 
 ---
@@ -20,13 +22,14 @@ decision-making style, and communication preferences across 4 dimensions.
 ## How It Works
 
 ```
-1. Get questions  →  2. AI agent answers  →  3. Compute MBTI  →  4. View results on web
+1. Get questions  →  2. AI agent answers  →  3. Compute MBTI  →  4. Benchmark  →  5. View results
 ```
 
 1. Run `npx ai-mbti-test questions` to get 60 MBTI questions as JSON
 2. Your AI agent reads and answers each question (score 1-7)
 3. Run `npx ai-mbti-test compute` with the answers to calculate the MBTI type
-4. Results are submitted to the web dashboard and a shareable URL is provided
+4. (Optional) TruthfulQA benchmark automatically measures hallucination rate
+5. Results are submitted to the web dashboard and a shareable URL is provided
 
 > [!NOTE]
 > **No API key required.** Your AI agent answers the questions directly. Only the final results are submitted to the server.
@@ -74,7 +77,7 @@ If you want to test a specific model programmatically without manual interaction
 npx ai-mbti-test run --prompt "You are a helpful coding assistant that writes clean, efficient code"
 ```
 
-The `run` command auto-detects `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `GOOGLE_API_KEY` from your environment.
+The `run` command auto-detects `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `GOOGLE_API_KEY` from your environment. After the MBTI test, a **TruthfulQA benchmark** (15 factual questions) automatically runs to measure hallucination rate.
 
 ```bash
 # Manual API key
@@ -83,6 +86,12 @@ npx ai-mbti-test run \
   --apiKey "sk-..." \
   --provider openai \
   --model "gpt-4o"
+
+# Repeat test 3 times for consistency measurement
+npx ai-mbti-test run --prompt "You are a helpful assistant" --repeat 3
+
+# Skip TruthfulQA benchmark
+npx ai-mbti-test run --prompt "You are a helpful assistant" --skip-benchmark
 ```
 
 ---
@@ -101,11 +110,16 @@ Compute MBTI result from pre-answered questions. No API key needed.
 |--------|----------|-------------|
 | `--prompt <text>` | **Yes** | System prompt for your AI agent |
 | `--answers <values>` | **Yes** | Comma-separated answers (60 values, each 1-7) |
-| `--baseUrl <url>` | No | Backend server URL (default: `http://localhost:3000`) |
+| `--baseUrl <url>` | No | Backend server URL |
+| `--modelProvider <name>` | No | Model provider (e.g. openai, anthropic, google) |
+| `--modelName <name>` | No | Model name (e.g. gpt-4o, claude-sonnet-4-20250514) |
+| `--modelVersion <ver>` | No | Model version |
+| `--agentName <name>` | No | Agent name (user-defined) |
+| `--temperature <number>` | No | Temperature used during the test |
 
 ### `ai-mbti-test run`
 
-Run MBTI test by calling an LLM API directly. Requires API key.
+Run MBTI test by calling an LLM API directly. Requires API key. Includes TruthfulQA benchmark by default.
 
 | Option | Required | Description |
 |--------|----------|-------------|
@@ -114,7 +128,10 @@ Run MBTI test by calling an LLM API directly. Requires API key.
 | `--apiKey <key>` | No | API key (auto-detected from env) |
 | `--model <name>` | No | Model name (auto-detected from env or provider default) |
 | `--apiBase <url>` | No | Custom API base URL for OpenAI-compatible endpoints |
-| `--baseUrl <url>` | No | Backend server URL (default: `http://localhost:3000`) |
+| `--baseUrl <url>` | No | Backend server URL |
+| `--agentName <name>` | No | Agent name (user-defined) |
+| `--repeat <number>` | No | Number of test repetitions, 1-20 (default: 1) |
+| `--skip-benchmark` | No | Skip TruthfulQA benchmark |
 
 ### Environment Variable Auto-Detection (for `run` command)
 
@@ -167,6 +184,28 @@ npx ai-mbti-test run \
 </details>
 
 <details>
+<summary><b>Repeat & Benchmark</b></summary>
+
+```bash
+# Run 5 times for test-retest reliability analysis
+npx ai-mbti-test run \
+  --prompt "You are a precise data analyst" \
+  --repeat 5
+
+# MBTI only (skip TruthfulQA benchmark)
+npx ai-mbti-test run \
+  --prompt "You are a helpful assistant" \
+  --skip-benchmark
+
+# Combine: 3 repetitions without benchmark
+npx ai-mbti-test run \
+  --prompt "You are a creative writer" \
+  --repeat 3 --skip-benchmark
+```
+
+</details>
+
+<details>
 <summary><b>Example Output</b></summary>
 
 ```
@@ -180,9 +219,71 @@ Scores:
   T: 85 / F: 35
   J: 79 / P: 41
 
+📈 Telemetry:
+  Total time: 45.2s
+  Avg response: 753ms
+  Retries: 2/60 questions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 TruthfulQA Benchmark Results
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Accuracy: 13/15 (86.7%)
+  Hallucination rate: 13.3%
+
+  By category:
+    science: 5/5 (100%)
+    math: 3/3 (100%)
+    geography: 2/2 (100%)
+    history: 2/2 (100%)
+    misconception: 0/2 (0%)
+    literature: 1/1 (100%)
+
 📤 Submitting results...
 
 ✅ View your results: https://example.com/result/a1b2c3d4-...
+```
+
+</details>
+
+<details>
+<summary><b>Example Output (--repeat 3)</b></summary>
+
+```
+═══════════════════════════════════════════
+  Run 1/3
+═══════════════════════════════════════════
+🎯 MBTI Type: INTJ
+...
+
+═══════════════════════════════════════════
+  Run 2/3
+═══════════════════════════════════════════
+🎯 MBTI Type: INTJ
+...
+
+═══════════════════════════════════════════
+  Run 3/3
+═══════════════════════════════════════════
+🎯 MBTI Type: INFJ
+...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 Aggregate Stats (3 runs)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Type distribution:
+    INTJ: 2/3 (67%)
+    INFJ: 1/3 (33%)
+  Type stability: 66.7%
+  Consistency score: 89.2/100
+
+  Dimension stability (mean ± stddev):
+    E: 38.3±1.2 / I: 81.7±1.2
+    S: 42.0±2.1 / N: 78.0±2.1
+    T: 72.3±14.5 / F: 47.7±14.5
+    J: 79.0±0.8 / P: 41.0±0.8
+
+  Hallucination rate: 13.3% ± 4.7%
 ```
 
 </details>
@@ -209,15 +310,19 @@ mbti-for-ai-agents/
 ├── packages/
 │   ├── shared/           # Shared module (questions, scoring, types) — published as @mbti/shared
 │   │   └── src/
-│   │       ├── questions.ts    # 60 MBTI questions
-│   │       ├── scoring.ts      # Score computation & type determination
-│   │       └── types.ts        # Shared TypeScript types
+│   │       ├── questions.ts           # 60 MBTI questions
+│   │       ├── scoring.ts             # Score computation & type determination
+│   │       ├── types.ts               # Shared TypeScript types
+│   │       ├── truthfulqa.ts          # 15 TruthfulQA factual questions
+│   │       └── truthfulqa-scoring.ts  # Keyword-based scoring logic
 │   └── cli/              # CLI tool — published as ai-mbti-test
 │       └── src/
 │           ├── index.ts        # Entry point + subcommand routing
 │           ├── llm.ts          # Multi-provider LLM integration
-│           ├── runner.ts       # Test orchestration
-│           └── submit.ts       # Result submission
+│           ├── runner.ts       # Test orchestration with telemetry
+│           ├── submit.ts       # Result submission
+│           ├── benchmark.ts    # TruthfulQA benchmark runner
+│           └── stats.ts        # Aggregate statistics for --repeat
 ├── package.json          # npm workspaces root
 └── tsconfig.base.json
 ```

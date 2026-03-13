@@ -45,12 +45,46 @@ export interface SubmitResultRequest {
   modelVersion?: string;
   agentName?: string;
   temperature?: number;
+  questionDetails?: QuestionDetail[];
+  totalRetries?: number;
+  totalLatencyMs?: number;
+  avgLatencyMs?: number;
+  runIndex?: number;
+  totalRuns?: number;
+  truthfulQA?: TruthfulSummary;
 }
 
 export interface SubmitResultResponse {
   status: 'success' | 'error';
   resultUrl?: string;
   error?: string;
+}
+
+export interface QuestionDetail {
+  questionId: number;
+  value: number;
+  rawText: string;
+  retryCount: number;
+  latencyMs: number;
+}
+
+export interface TruthfulResult {
+  questionId: string;
+  category: string;
+  rawResponse: string;
+  correct: boolean;
+  matchedKeyword?: string;
+  rejectedKeyword?: string;
+  latencyMs: number;
+}
+
+export interface TruthfulSummary {
+  total: number;
+  correct: number;
+  accuracyRate: number;
+  hallucinationRate: number;
+  byCategory: Record<string, { total: number; correct: number; accuracyRate: number }>;
+  results: TruthfulResult[];
 }
 
 export type MbtiType = string; // 4-char MBTI type like "INTJ"

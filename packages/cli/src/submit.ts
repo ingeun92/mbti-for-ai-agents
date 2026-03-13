@@ -1,3 +1,5 @@
+import type { QuestionDetail, TruthfulSummary } from '@mbti/shared';
+
 export interface SubmitMetadata {
   rawAnswers?: number[];
   modelProvider?: string;
@@ -5,6 +7,13 @@ export interface SubmitMetadata {
   modelVersion?: string;
   agentName?: string;
   temperature?: number;
+  questionDetails?: QuestionDetail[];
+  totalRetries?: number;
+  totalLatencyMs?: number;
+  avgLatencyMs?: number;
+  runIndex?: number;
+  totalRuns?: number;
+  truthfulQA?: TruthfulSummary;
 }
 
 export async function submitResult(
@@ -27,6 +36,13 @@ export async function submitResult(
       ...(metadata?.modelVersion && { modelVersion: metadata.modelVersion }),
       ...(metadata?.agentName && { agentName: metadata.agentName }),
       ...(metadata?.temperature != null && { temperature: metadata.temperature }),
+      ...(metadata?.questionDetails && { questionDetails: metadata.questionDetails }),
+      ...(metadata?.totalRetries != null && { totalRetries: metadata.totalRetries }),
+      ...(metadata?.totalLatencyMs != null && { totalLatencyMs: metadata.totalLatencyMs }),
+      ...(metadata?.avgLatencyMs != null && { avgLatencyMs: metadata.avgLatencyMs }),
+      ...(metadata?.runIndex != null && { runIndex: metadata.runIndex }),
+      ...(metadata?.totalRuns != null && { totalRuns: metadata.totalRuns }),
+      ...(metadata?.truthfulQA && { truthfulQA: metadata.truthfulQA }),
     }),
   });
 
